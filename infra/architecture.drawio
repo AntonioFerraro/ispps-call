@@ -1,0 +1,96 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
+  <diagram name="Page-1" id="QHCR87cHFo068fvsfJMM">
+    <mxGraphModel dx="2378" dy="1562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-13" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;gradientColor=none;" parent="1" vertex="1">
+          <mxGeometry x="160" y="320" width="580" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-8" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="338.75" y="360" width="242.5" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-1" target="mQ0MvtLYXcvH7dRVrLAp-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-16" value="Browser" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="mQ0MvtLYXcvH7dRVrLAp-12" vertex="1" connectable="0">
+          <mxGeometry x="-0.069" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-1" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.laptop;" parent="1" vertex="1">
+          <mxGeometry x="423.38" y="253.54" width="73.24" height="42.93" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-5" target="mQ0MvtLYXcvH7dRVrLAp-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-15" value="Phone Call" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=default;" parent="mQ0MvtLYXcvH7dRVrLAp-14" vertex="1" connectable="0">
+          <mxGeometry x="0.1071" y="1" relative="1" as="geometry">
+            <mxPoint x="-1" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-5" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.cell_phone_generic;" parent="1" vertex="1">
+          <mxGeometry x="220.18" y="250" width="27.65" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-6" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Container_App_Environments.svg;" parent="1" vertex="1">
+          <mxGeometry x="350" y="368" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-7" target="mQ0MvtLYXcvH7dRVrLAp-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-21" value="Retrieval Augmented &lt;br&gt;Generation (RAG)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=default;" parent="mQ0MvtLYXcvH7dRVrLAp-19" vertex="1" connectable="0">
+          <mxGeometry x="0.3681" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-7" target="mQ0MvtLYXcvH7dRVrLAp-27" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="520" />
+              <mxPoint x="234" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-31" value="audio stream" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="mQ0MvtLYXcvH7dRVrLAp-28" vertex="1" connectable="0">
+          <mxGeometry x="0.8625" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-7" value="&lt;b&gt;Azure Container App&lt;/b&gt;&lt;br&gt;Business Logic" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Worker_Container_App.svg;" parent="1" vertex="1">
+          <mxGeometry x="426" y="390" width="68" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-9" target="mQ0MvtLYXcvH7dRVrLAp-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-26" value="callback" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="mQ0MvtLYXcvH7dRVrLAp-18" vertex="1" connectable="0">
+          <mxGeometry x="0.009" relative="1" as="geometry">
+            <mxPoint x="-38" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-9" value="&lt;span&gt;&lt;b&gt;Azure &lt;br&gt;Communication &lt;br&gt;Services&lt;/b&gt;&lt;/span&gt;" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_Communication_Services.svg;" parent="1" vertex="1">
+          <mxGeometry x="200" y="398" width="68" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="mQ0MvtLYXcvH7dRVrLAp-10" target="mQ0MvtLYXcvH7dRVrLAp-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-30" value="indexes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="mQ0MvtLYXcvH7dRVrLAp-29" vertex="1" connectable="0">
+          <mxGeometry x="-0.0011" relative="1" as="geometry">
+            <mxPoint y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-10" value="&lt;b&gt;Azure AI Search&lt;/b&gt;&lt;br&gt;Vector Store" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/app_services/Search_Services.svg;" parent="1" vertex="1">
+          <mxGeometry x="426" y="577.44" width="68" height="49.120000000000005" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-11" value="&lt;b&gt;Azure Storage Account&lt;/b&gt;&lt;br&gt;Raw Data Store" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts.svg;" parent="1" vertex="1">
+          <mxGeometry x="620" y="576" width="65" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-25" value="Microsoft Azure" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="600" y="320" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="mQ0MvtLYXcvH7dRVrLAp-27" value="&lt;b&gt;Azure OpenAI&lt;/b&gt;&lt;div&gt;GPT-4o Realtime&lt;/div&gt;" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/ai_machine_learning/Azure_OpenAI.svg;" parent="1" vertex="1">
+          <mxGeometry x="200.01" y="560" width="68" height="68" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
