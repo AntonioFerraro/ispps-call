@@ -19,7 +19,7 @@ logger = logging.getLogger("voicerag")
 async def create_app():
     load_dotenv()
 
-    azure_credentials = get_azure_credentials(os.environ.get("AZURE_TENANT_ID"))
+    # azure_credentials = get_azure_credentials(os.environ.get("AZURE_TENANT_ID"))
     search_client: Optional[SearchClient] = None
     caller: Optional[AcsCaller] = None
 
@@ -27,7 +27,7 @@ async def create_app():
     llm_endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
     llm_deployment = os.environ.get("AZURE_OPENAI_COMPLETION_DEPLOYMENT_NAME")
     llm_key = os.environ.get("AZURE_OPENAI_API_KEY")
-    llm_credential = azure_credentials if not llm_key else AzureKeyCredential(llm_key)
+    llm_credential = AzureKeyCredential(llm_key)
     if not llm_endpoint or not llm_deployment or not llm_credential:
         raise ValueError("LLM connection or authentication error. Check environment variables.")
 
