@@ -94,6 +94,7 @@ async def create_app():
 
     # Define the WebSocket handler for the Azure Communication Services Audio Stream
     async def websocket_handler_acs(request: web.Request):
+        print("WebSocket ACS connesso")  # AGGIUNGI QUI
         ws = web.WebSocketResponse()
         await ws.prepare(request)
         await rtmt.forward_messages(ws, True)
