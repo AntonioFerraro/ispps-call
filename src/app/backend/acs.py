@@ -27,7 +27,7 @@ class AcsCaller:
             raise ValueError("Missing ACS_BASE_URL environment variable")
 
         self.callback_uri = base_url.rstrip("/") + acs_callback_path
-        self.websocket_url = base_url.rstrip("/") + acs_media_streaming_websocket_path
+        self.websocket_url = base_url.rstrip("/").replace("https://", "wss://") + acs_media_streaming_websocket_path
 
         print(f"📞 Callback URI: {self.callback_uri}")
         print(f"🎙️  WebSocket URL: {self.websocket_url}")
