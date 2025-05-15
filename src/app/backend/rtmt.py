@@ -134,7 +134,6 @@ class RTMiddleTier:
                             data = json.loads(msg.data)
                             print(f"⬅️ [CLIENT → SERVER] Ricevuto: {data}")
 
-                            # ✅ Log user messages – anche da ACS se contiene testo
                             if data.get("type") == "conversation.input":
                                 text = data.get("input", {}).get("text")
                                 if text:
@@ -164,6 +163,22 @@ class RTMiddleTier:
                                     "content": data.get("text", "[empty]")
                                 })
                                 print(f"📝 [LOG] Assistant (text): {messages[-1]}")
+
+                            elif data.get("type") == "response.done":
+                                # ✅ Prende transcript da item.audio → transcript
+                                output = data.get("response", {}).get("output", [])
+                                for item in output:
+                                    if item.get("type") == "message":
+                                        contents = item.get("content", [])
+                                        for block in contents:
+                                            if block.get("type") == "audio" and "transcript" in block:
+                                                messages.append({
+                                                    "call_id": call_id,
+                                                    "role": "assistant",
+                                                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                                                    "content": block["transcript"]
+                                                })
+                                                print(f"📝 [LOG] Assistant (transcript): {messages[-1]}")
 
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
