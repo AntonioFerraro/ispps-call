@@ -13,6 +13,7 @@ from backend.acs import AcsCaller
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.aio import SearchClient
 from functools import partial
+from backend.log import log_conversation
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger("voicerag")
@@ -97,15 +98,19 @@ async def create_app():
 
     # Define the WebSocket handler for the Azure Communication Services Audio Stream
     async def websocket_handler_acs(request: web.Request):
+
         ws = web.WebSocketResponse()
         await ws.prepare(request)
 
-        # Se vuoi distinguere tra inbound/outbound puoi usare query param o header
         direction = request.query.get("direction", "unknown")
-        print(f"Direzione flusso audio: {direction}")
+        call_id = request.query.get("callConnectionId", "unknown-call")
 
-        # Avvia il forwarding audio (es: a OpenAI Realtime)
-        await rtmt.forward_messages(ws, True)
+        print(f"Direzione flusso audio: {direction}")
+        print(f"🔌 WebSocket ACS connesso per call: {call_id}")
+
+        # Ricevi messaggi e salva log conversazione
+        messages = await rtmt.forward_messages(ws, True)
+        log_conversation(call_id, messages)
 
         return ws
 

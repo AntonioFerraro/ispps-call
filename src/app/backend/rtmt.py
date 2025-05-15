@@ -7,6 +7,7 @@ from azure.identity import DefaultAzureCredential, AzureDeveloperCliCredential, 
 from azure.core.credentials import AzureKeyCredential
 from backend.tools.tools import RTToolCall, Tool, ToolResultDirection
 from backend.helpers import transform_acs_to_openai_format, transform_openai_to_acs_format
+import time
 
 class RTMiddleTier:
     endpoint: str
@@ -36,11 +37,11 @@ class RTMiddleTier:
         if message is not None:
             match message["type"]:
                 case "session.updated":
-                    print("🧠 Sessione aggiornata → forzo risposta dell'AI")
+                    print("Sessione aggiornata → forzo risposta dell'AI")
                     await server_ws.send_json({ "type": "response.create" })
 
                 case "response.audio.delta":
-                    print("🔊 Ricevuto audio delta da OpenAI")
+                    print("Ricevuto audio delta da OpenAI")
 
                 case "response.output_item.added":
                     if "item" in message and message["item"]["type"] == "function_call":
@@ -51,13 +52,13 @@ class RTMiddleTier:
                         message = None
 
                 case "response.output_item.done":
-                    print("✅ Fine della risposta")
+                    print("Fine della risposta")
                     if len(self._tools_pending) > 0:
                         self._tools_pending.clear()
                         await server_ws.send_json({ "type": "response.create" })
 
                 case "input_audio_buffer.speech_started":
-                    print("🛑 Utente ha iniziato a parlare (interruzione)")
+                    print("Utente ha iniziato a parlare (interruzione)")
 
         if is_acs_audio_stream and message is not None:
             original_type = message.get("type")
@@ -97,7 +98,14 @@ class RTMiddleTier:
 
             await server_ws.send_str(json.dumps(data))
 
-    async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool):
+    async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool) -> list[dict]:
+        messages: list[dict] = []
+
+        # Pulizia call_id e start time
+        raw_call_id = ws.query.get("callConnectionId", "unknown-call")
+        call_id = "".join(c for c in raw_call_id if c.isalnum() or c in ("-", "_"))
+        start_time = time.time()
+
         async with aiohttp.ClientSession(base_url=self.endpoint) as session:
             params = {
                 "api-version": "2024-10-01-preview",
@@ -120,19 +128,40 @@ class RTMiddleTier:
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
+                            if not is_acs_audio_stream and data.get("type") == "conversation.input":
+                                messages.append({
+                                    "call_id": call_id,
+                                    "role": "user",
+                                    "content": data.get("input", {}).get("text", "[empty]")
+                                })
                             await self._process_message_to_server(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print("❌ Messaggio non testuale ricevuto dal client")
+                            print("Messaggio non testuale ricevuto dal client")
 
                 async def from_server_to_client():
                     async for msg in target_ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
+                            if not is_acs_audio_stream and data.get("type") == "conversation.output":
+                                messages.append({
+                                    "call_id": call_id,
+                                    "role": "assistant",
+                                    "content": data.get("text", "[empty]")
+                                })
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print("❌ Messaggio non testuale ricevuto dal server")
+                            print("Messaggio non testuale ricevuto dal server")
 
                 try:
                     await asyncio.gather(from_client_to_server(), from_server_to_client())
                 except ConnectionResetError:
                     print("🔌 Connessione WebSocket terminata dal client")
+
+        duration_sec = round(time.time() - start_time, 2)
+        messages.append({
+            "call_id": call_id,
+            "role": "system",
+            "content": f"Durata sessione: {duration_sec} secondi"
+        })
+
+        return messages
