@@ -49,7 +49,7 @@ class AcsCaller:
         target_participant = PhoneNumberIdentifier(target_number)
         source_caller = PhoneNumberIdentifier(self.source_number)
 
-        print("📤 Chiamata in corso...")
+        print("Chiamata in corso...")
         self.call_automation_client.create_call(
             target_participant,
             self.callback_uri,
@@ -100,7 +100,7 @@ class AcsCaller:
                     call_automation_client = CallAutomationClient.from_connection_string(self.acs_connection_string)
                     call_automation_client.answer_call(
                         incoming_call_context,
-                        callback_uri=self.callback_uri,
+                        self.callback_uri,
                         media_streaming=self.media_streaming_configuration
                     )
                     print("✅ Risposta alla chiamata eseguita")
