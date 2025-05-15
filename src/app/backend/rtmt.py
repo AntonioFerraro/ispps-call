@@ -102,6 +102,7 @@ class RTMiddleTier:
     async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool, request: Optional[web.Request] = None) -> list[dict]:
         messages: list[dict] = []
 
+        # Estrai call_id dalla query della request
         raw_call_id = request.query.get("callConnectionId", "unknown-call") if request else "unknown-call"
         call_id = "".join(c for c in raw_call_id if c.isalnum() or c in ("-", "_"))
         start_time = time.time()
@@ -132,39 +133,56 @@ class RTMiddleTier:
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
-                            print(f"⬅️ [CLIENT → SERVER] {data.get('type')} – {data}")
+                            print(f"⬅️ [CLIENT → SERVER] Ricevuto: {data}")
 
                             if not is_acs_audio_stream and data.get("type") == "conversation.input":
-                                print("📝 LOG → Aggiunto messaggio USER per logging")
                                 messages.append({
                                     "call_id": call_id,
                                     "role": "user",
                                     "timestamp": datetime.now(timezone.utc).isoformat(),
                                     "content": data.get("input", {}).get("text", "[empty]")
                                 })
+                                print(f"📝 [LOG] Aggiunto messaggio user: {messages[-1]}")
 
                             await self._process_message_to_server(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print(f"⚠️ Messaggio CLIENT ignorato – tipo: {msg.type}")
+                            print(f"⚠️ Messaggio client ignorato: {msg.type}")
 
                 async def from_server_to_client():
                     async for msg in target_ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
-                            print(f"➡️ [SERVER → CLIENT] {data.get('type')} – {data}")
+                            print(f"➡️ [SERVER → CLIENT] Ricevuto: {data}")
 
-                            if not is_acs_audio_stream and data.get("type") == "conversation.output":
-                                print("📝 LOG → Aggiunto messaggio ASSISTANT per logging")
+                            if not is_acs_audio_stream:
+                                if data.get("type") == "conversation.output":
+                                    messages.append({
+                                        "call_id": call_id,
+                                        "role": "assistant",
+                                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                                        "content": data.get("text", "[empty]")
+                                    })
+                                    print(f"📝 [LOG] Aggiunto messaggio assistant (text): {messages[-1]}")
+                                elif data.get("type") == "response.audio.delta":
+                                    messages.append({
+                                        "call_id": call_id,
+                                        "role": "assistant",
+                                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                                        "content": "[audio-delta]"
+                                    })
+                                    print(f"📝 [LOG] Aggiunto audio-delta come placeholder")
+                            elif is_acs_audio_stream and data.get("type") == "response.audio.delta":
                                 messages.append({
                                     "call_id": call_id,
                                     "role": "assistant",
                                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                                    "content": data.get("text", "[empty]")
+                                    "content": "[assistant speaking]"
                                 })
+                                print(f"📝 [LOG] ACS audio-delta loggato come '[assistant speaking]'")
 
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print(f"⚠️ Messaggio SERVER ignorato – tipo: {msg.type}")
+                            print(f"⚠️ Messaggio server ignorato: {msg.type}")
 
                 try:
                     await asyncio.gather(from_client_to_server(), from_server_to_client())
