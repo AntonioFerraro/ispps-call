@@ -74,32 +74,41 @@ class AcsCaller:
         return web.Response(status=200)
     
     async def inbound_call_event_handler(self, request):
-        body = await request.json()
+        try:
+            body = await request.json()
+            if not isinstance(body, list):
+                print("Payload Event Grid non è una lista")
+                return web.Response(status=400)
 
-        for event_dict in body:
-            event_type = event_dict.get("eventType")
+            for event_dict in body:
+                event_type = event_dict.get("eventType")
 
-            if event_type == "Microsoft.EventGrid.SubscriptionValidationEvent":
-                validation_code = event_dict["data"]["validationCode"]
-                print(f"Event Grid validation ricevuta: {validation_code}")
-                return web.json_response({"validationResponse": validation_code})
+                if event_type == "Microsoft.EventGrid.SubscriptionValidationEvent":
+                    validation_code = event_dict["data"]["validationCode"]
+                    print(f"Event Grid validation ricevuta: {validation_code}")
+                    return web.json_response({"validationResponse": validation_code})
 
-            elif event_type == "Microsoft.Communication.IncomingCall":
-                data = event_dict["data"]
-                incoming_call_context = data.get("incomingCallContext")
-                from_number = data.get("from")
-                to_number = data.get("to")
+                elif event_type == "Microsoft.Communication.IncomingCall":
+                    data = event_dict["data"]
+                    incoming_call_context = data.get("incomingCallContext")
+                    from_number = data.get("from")
+                    to_number = data.get("to")
 
-                print(f"Incoming call da {from_number} a {to_number}")
+                    print(f"Incoming call da {from_number} a {to_number}")
 
-                # Rispondi alla chiamata
-                call_automation_client = CallAutomationClient.from_connection_string(self.acs_connection_string)
-                call_automation_client.answer_call(
-                    incoming_call_context,
-                    callback_uri=self.callback_uri,
-                    media_streaming=self.media_streaming_configuration
-                )
-                print("Risposta alla chiamata eseguita")
+                    # Rispondi alla chiamata
+                    call_automation_client = CallAutomationClient.from_connection_string(self.acs_connection_string)
+                    call_automation_client.answer_call(
+                        incoming_call_context,
+                        callback_uri=self.callback_uri,
+                        media_streaming=self.media_streaming_configuration
+                    )
+                    print("✅ Risposta alla chiamata eseguita")
+
+        except Exception as e:
+            print(f"Errore handler inbound: {str(e)}")
+            return web.Response(status=500)
 
         return web.Response(status=200)
+
 
