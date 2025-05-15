@@ -102,7 +102,6 @@ class RTMiddleTier:
     async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool, request: Optional[web.Request] = None) -> list[dict]:
         messages: list[dict] = []
 
-        # Estrai call_id dalla query della request
         raw_call_id = request.query.get("callConnectionId", "unknown-call") if request else "unknown-call"
         call_id = "".join(c for c in raw_call_id if c.isalnum() or c in ("-", "_"))
         start_time = time.time()
@@ -135,14 +134,17 @@ class RTMiddleTier:
                             data = json.loads(msg.data)
                             print(f"⬅️ [CLIENT → SERVER] Ricevuto: {data}")
 
-                            if not is_acs_audio_stream and data.get("type") == "conversation.input":
-                                messages.append({
-                                    "call_id": call_id,
-                                    "role": "user",
-                                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                                    "content": data.get("input", {}).get("text", "[empty]")
-                                })
-                                print(f"📝 [LOG] Aggiunto messaggio user: {messages[-1]}")
+                            # ✅ Log user messages – anche da ACS se contiene testo
+                            if data.get("type") == "conversation.input":
+                                text = data.get("input", {}).get("text")
+                                if text:
+                                    messages.append({
+                                        "call_id": call_id,
+                                        "role": "user",
+                                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                                        "content": text
+                                    })
+                                    print(f"📝 [LOG] Utente (text): {messages[-1]}")
 
                             await self._process_message_to_server(data, ws, target_ws, is_acs_audio_stream)
                         else:
@@ -154,31 +156,14 @@ class RTMiddleTier:
                             data = json.loads(msg.data)
                             print(f"➡️ [SERVER → CLIENT] Ricevuto: {data}")
 
-                            if not is_acs_audio_stream:
-                                if data.get("type") == "conversation.output":
-                                    messages.append({
-                                        "call_id": call_id,
-                                        "role": "assistant",
-                                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                                        "content": data.get("text", "[empty]")
-                                    })
-                                    print(f"📝 [LOG] Aggiunto messaggio assistant (text): {messages[-1]}")
-                                elif data.get("type") == "response.audio.delta":
-                                    messages.append({
-                                        "call_id": call_id,
-                                        "role": "assistant",
-                                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                                        "content": "[audio-delta]"
-                                    })
-                                    print(f"📝 [LOG] Aggiunto audio-delta come placeholder")
-                            elif is_acs_audio_stream and data.get("type") == "response.audio.delta":
+                            if data.get("type") == "conversation.output":
                                 messages.append({
                                     "call_id": call_id,
                                     "role": "assistant",
                                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                                    "content": "[assistant speaking]"
+                                    "content": data.get("text", "[empty]")
                                 })
-                                print(f"📝 [LOG] ACS audio-delta loggato come '[assistant speaking]'")
+                                print(f"📝 [LOG] Assistant (text): {messages[-1]}")
 
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
