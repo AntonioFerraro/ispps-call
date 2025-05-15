@@ -141,7 +141,6 @@ async def create_app():
     app.router.add_get("/realtime", websocket_handler)
     app.router.add_get("/realtime-acs", websocket_handler_acs)
     app.router.add_post('/update-voice', update_voice)
-    app.router.add_post("/acs-inbound-call", websocket_handler_acs)
     
     if (caller is not None):
         app.router.add_post("/acs", caller.outbound_call_handler)
