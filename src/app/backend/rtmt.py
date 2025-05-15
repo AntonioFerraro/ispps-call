@@ -98,11 +98,11 @@ class RTMiddleTier:
 
             await server_ws.send_str(json.dumps(data))
 
-    async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool) -> list[dict]:
+    async def forward_messages(self, ws: web.WebSocketResponse, is_acs_audio_stream: bool, request: Optional[web.Request] = None) -> list[dict]:
         messages: list[dict] = []
 
-        # Pulizia call_id e start time
-        raw_call_id = ws.query.get("callConnectionId", "unknown-call")
+        # Estrai call_id dalla query della request
+        raw_call_id = request.query.get("callConnectionId", "unknown-call") if request else "unknown-call"
         call_id = "".join(c for c in raw_call_id if c.isalnum() or c in ("-", "_"))
         start_time = time.time()
 

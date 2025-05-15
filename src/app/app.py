@@ -109,7 +109,7 @@ async def create_app():
         print(f"🔌 WebSocket ACS connesso per call: {call_id}")
 
         # Ricevi messaggi e salva log conversazione
-        messages = await rtmt.forward_messages(ws, True)
+        messages = await rtmt.forward_messages(ws, True, request)
         log_conversation(call_id, messages)
 
         return ws
