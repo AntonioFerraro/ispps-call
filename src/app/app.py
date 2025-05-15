@@ -12,6 +12,7 @@ from backend.rtmt import RTMiddleTier
 from backend.acs import AcsCaller
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.aio import SearchClient
+from functools import partial
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger("voicerag")
@@ -47,6 +48,7 @@ async def create_app():
     acs_connection_string = os.environ.get("ACS_CONNECTION_STRING")
     acs_callback_path = os.environ.get("ACS_CALLBACK_PATH")
     acs_media_streaming_websocket_path = os.environ.get("ACS_MEDIA_STREAMING_WEBSOCKET_PATH")
+    acs_inbound_event_grid_path = os.environ.get("ACS_INBOUND_EVENT_GRID_PATH")
     if (acs_source_number is not None and
         acs_connection_string is not None and
         acs_callback_path is not None and
@@ -55,7 +57,8 @@ async def create_app():
             acs_source_number,
             acs_connection_string,
             acs_callback_path,
-            acs_media_streaming_websocket_path
+            acs_media_streaming_websocket_path,
+            acs_inbound_event_grid_path
         )
     else:
         logger.warning("Azure Communication Services is not configured")
@@ -94,10 +97,16 @@ async def create_app():
 
     # Define the WebSocket handler for the Azure Communication Services Audio Stream
     async def websocket_handler_acs(request: web.Request):
-        print("WebSocket ACS connesso")  # AGGIUNGI QUI
         ws = web.WebSocketResponse()
         await ws.prepare(request)
+
+        # Se vuoi distinguere tra inbound/outbound puoi usare query param o header
+        direction = request.query.get("direction", "unknown")
+        print(f"Direzione flusso audio: {direction}")
+
+        # Avvia il forwarding audio (es: a OpenAI Realtime)
         await rtmt.forward_messages(ws, True)
+
         return ws
 
     # Serve static files and index.html
@@ -122,6 +131,7 @@ async def create_app():
             return web.Response(text="Created outbound call")
         else:
             return web.Response(text="Outbound calling is not configured")
+        
 
     # Register the routes
     app = web.Application()
@@ -131,9 +141,11 @@ async def create_app():
     app.router.add_get("/realtime", websocket_handler)
     app.router.add_get("/realtime-acs", websocket_handler_acs)
     app.router.add_post('/update-voice', update_voice)
+    app.router.add_post("/acs-inbound-call", websocket_handler_acs)
     
     if (caller is not None):
         app.router.add_post("/acs", caller.outbound_call_handler)
+        app.router.add_post("/acs-inbound-call", partial(caller.inbound_call_event_handler))
 
     return app
 
