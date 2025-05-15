@@ -8,6 +8,7 @@ from azure.core.credentials import AzureKeyCredential
 from backend.tools.tools import RTToolCall, Tool, ToolResultDirection
 from backend.helpers import transform_acs_to_openai_format, transform_openai_to_acs_format
 import time
+from datetime import datetime, timezone
 
 class RTMiddleTier:
     endpoint: str
@@ -106,6 +107,8 @@ class RTMiddleTier:
         call_id = "".join(c for c in raw_call_id if c.isalnum() or c in ("-", "_"))
         start_time = time.time()
 
+        print(f"🟢 forward_messages avviato – call_id: {call_id}, ACS: {is_acs_audio_stream}")
+
         async with aiohttp.ClientSession(base_url=self.endpoint) as session:
             params = {
                 "api-version": "2024-10-01-preview",
@@ -124,44 +127,58 @@ class RTMiddleTier:
                 raise ValueError("No token provider available")
 
             async with session.ws_connect("/openai/realtime", headers=headers, params=params) as target_ws:
+                print("🔗 Connessione a OpenAI Realtime stabilita")
+
                 async def from_client_to_server():
                     async for msg in ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
+                            print(f"⬅️ [CLIENT → SERVER] Ricevuto: {data}")
+
                             if not is_acs_audio_stream and data.get("type") == "conversation.input":
                                 messages.append({
                                     "call_id": call_id,
                                     "role": "user",
+                                    "timestamp": datetime.now(timezone.utc).isoformat(),
                                     "content": data.get("input", {}).get("text", "[empty]")
                                 })
+
                             await self._process_message_to_server(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print("Messaggio non testuale ricevuto dal client")
+                            print(f"⚠️ Messaggio client ignorato: {msg.type}")
 
                 async def from_server_to_client():
                     async for msg in target_ws:
                         if msg.type == aiohttp.WSMsgType.TEXT:
                             data = json.loads(msg.data)
+                            print(f"➡️ [SERVER → CLIENT] Ricevuto: {data}")
+
                             if not is_acs_audio_stream and data.get("type") == "conversation.output":
                                 messages.append({
                                     "call_id": call_id,
                                     "role": "assistant",
+                                    "timestamp": datetime.now(timezone.utc).isoformat(),
                                     "content": data.get("text", "[empty]")
                                 })
+
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
-                            print("Messaggio non testuale ricevuto dal server")
+                            print(f"⚠️ Messaggio server ignorato: {msg.type}")
 
                 try:
                     await asyncio.gather(from_client_to_server(), from_server_to_client())
                 except ConnectionResetError:
                     print("🔌 Connessione WebSocket terminata dal client")
+                except Exception as e:
+                    print(f"❌ Errore durante lo scambio WebSocket: {e}")
 
         duration_sec = round(time.time() - start_time, 2)
         messages.append({
             "call_id": call_id,
             "role": "system",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "content": f"Durata sessione: {duration_sec} secondi"
         })
 
+        print(f"📦 Conversazione terminata. Messaggi totali: {len(messages)}")
         return messages
