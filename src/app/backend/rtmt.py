@@ -142,7 +142,7 @@ class RTMiddleTier:
                                         "role": "user",
                                         "content": text
                                     })
-                                    print(f"📝 [LOG] Utente (text): {messages[-1]}")
+                                    print(f"📝 [LOG] Utente (text): {text}")
 
                             await self._process_message_to_server(data, ws, target_ws, is_acs_audio_stream)
                         else:
@@ -160,21 +160,22 @@ class RTMiddleTier:
                                     "role": "assistant",
                                     "content": data.get("text", "[empty]")
                                 })
-                                print(f"📝 [LOG] Assistant (text): {messages[-1]}")
+                                print(f"📝 [LOG] Assistant (text): {data.get('text', '[empty]')}")
 
                             elif data.get("type") == "response.done":
                                 output = data.get("response", {}).get("output", [])
                                 for item in output:
                                     if item.get("type") == "message":
+                                        role = item.get("role", "assistant")
                                         contents = item.get("content", [])
                                         for block in contents:
                                             if block.get("type") == "audio" and "transcript" in block:
                                                 messages.append({
                                                     "call_id": call_id,
-                                                    "role": "assistant",
+                                                    "role": role,
                                                     "content": block["transcript"]
                                                 })
-                                                print(f"📝 [LOG] Assistant (transcript): {messages[-1]}")
+                                                print(f"📝 [LOG] {role.capitalize()} (transcript): {block['transcript']}")
 
                             await self._process_message_to_client(data, ws, target_ws, is_acs_audio_stream)
                         else:
